@@ -2,18 +2,21 @@ mov ah, 0x0e
 mov al, 65
 int 0x10
 
-print_alphabet:
+print_alphabet:  
 
-    inc al
+    add al, 33
     int 0x10
 
-    cmp al, 90
-    je loop_forever
+    cmp al, 122
+    je halt_program
+
+    sub al, 31
+    int 0x10
 
     jmp print_alphabet
 
-loop_forever:
-    jmp $
+halt_program:
+    hlt
 
 times 510 - ($ - $$) db 0
 db 0x55, 0xaa
