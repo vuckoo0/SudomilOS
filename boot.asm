@@ -1,19 +1,22 @@
+[org 0x7c00]
+
 mov ah, 0x0e
-mov al, 65
-int 0x10
+mov bx, wecome_statement
 
-print_alphabet:  
+print_string:
 
-    add al, 33
-    int 0x10
+    mov al, [bx]
 
-    cmp al, 122
+    cmp al, 0
     je halt_program
 
-    sub al, 31
     int 0x10
+    inc bx
 
-    jmp print_alphabet
+    jmp print_string
+
+wecome_statement:
+    db "Welcome to SudomilOS", 0
 
 halt_program:
     hlt
