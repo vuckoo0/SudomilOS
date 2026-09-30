@@ -1,62 +1,26 @@
 [org 0x7c00]
 
-mov bx, buffer
+mov [diskNumber], dl
 
-input_string:
+mov ah, 2            ; Obavezno
+mov al, 1            ; Broj sektorta koji hocemo da citamo
+mov ch, 0            ; Iz kog cilindra citamo
+mov cl, 2            ; Sektor iz kog krecemo citanje (i on se cita)
+mov dh, 0            ; Koji hed koristimo za citanje
+mov dl, [diskNumber] ; Broj diska sa kog citamo (u slucaju da je na racunar nakaceno vise diskova)
+; mov es, 0         ; Koristi se za dostizanja vecih adresa koje ne mogu da se predstave sa 16 bita
+mov bx, 0x7e00       ; Adresa od koje stavljameo podatke sa diska
 
-    mov ah, 0
-    int 0x16
+int 0x13
 
-    cmp al, 0x0d
-    je end
-    
-    cmp bx, buffer + 32
-    je input_string
+mov ah, 0x0e         ; Potrebno za pisanje karaktera na ekran
 
-    mov [bx], al
-    inc bx
+mov al, [0x7e00]     ; Stavaljamo vrednost koju hocemo da prikazemo u registar
+int 0x10             ; Prikazi karakter iz registra al na ekran
 
-    mov ah, 0x0e
-    int 0x10
-    jmp input_string
-
-end:
-
-    mov ah, 0x0e
-
-    mov bx, newline
-    call print_string
-
-    mov bx, exit_statement
-    call print_string
-
-    mov bx, buffer
-    call print_string
-
-    mov bx, newline
-    call print_string
-
-    jmp loop_forever
-
-print_string:
-
-    mov al, [bx]
-
-    cmp al, 0
-    jne .skip
-    ret
-.skip:
-
-    int 0x10
-    inc bx
-    jmp print_string
-
-loop_forever:
-    jmp $
-
-buffer: times 32 + 1 db 0
-exit_statement: db "Bye ", 0
-newline: db 0x0d, 0x0a, 0
+diskNumber: db 0
 
 times 510 - ($ - $$) db 0
 db 0x55, 0xaa
+
+db "vuckoo0"
