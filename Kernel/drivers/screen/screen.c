@@ -1,6 +1,6 @@
 #include "screen.h"
 
-volatile char* video_memory = (char*)0xb8000;
+static volatile char* video_memory = (char*)0xb8000;
 
 static int cursor_row = 0;
 static int cursor_col = 0;
@@ -10,16 +10,40 @@ static void update_pointer() {
 }
 
 
-void putc(const char c) {
+void putchar(const char c) {
 
     if (c == '\n') {
+
         cursor_col = 0;
         cursor_row++;
+
+        update_pointer();
+
+        putstring("$ ");
+
+    } else if (c == '\b') {
+
+        if (cursor_col > 0) {
+            cursor_col--;
+        } else if (cursor_row > 0) {
+            cursor_row--;
+            cursor_col = 79;
+        }
+        
+        update_pointer();
+        video_memory[0] = ' ';
+        video_memory[1] = 0x02;
+
+        return;
     } else {
+
         video_memory[0] = c;
         video_memory[1] = 0x02;
+    
         cursor_col++;
-        if (cursor_col >= 80) {   // wrap at end of line
+
+        if (cursor_col >= 80) { 
+
             cursor_col = 0;
             cursor_row++;
         }
@@ -28,7 +52,7 @@ void putc(const char c) {
     update_pointer();
 }
 
-void putstr(const char *s) {
+void putstring(const char *s) {
     
     int i = 0;
     while (1) {
@@ -39,7 +63,7 @@ void putstr(const char *s) {
             break;
         }
 
-        putc(current_char);
+        putchar(current_char);
         i += 1;
     }
 }

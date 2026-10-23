@@ -1,4 +1,5 @@
 #include "drivers/screen/screen.h"
+#include "drivers/keyboard/keyboard.h"
 #include "cpu/idt.h"
 #include "cpu/pic.h"
 
@@ -7,10 +8,17 @@ void main() {
     screenclr();
     pic_remap();
     idt_init();
-    pic_unmask(1);
     __asm__ volatile ("sti");
 
-    putstr("$ ");
+    while (1) {
 
-    for (;;) {}
+        putstring("$ ");
+
+        char username[32];
+        readstring(username, 32);
+
+        putstring(username);
+        putchar('\n');
+    }
+
 }

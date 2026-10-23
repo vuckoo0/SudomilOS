@@ -30,6 +30,10 @@ void pic_remap() {
     // restore masks
     port_write(PIC1_DATA, mask1);
     port_write(PIC2_DATA, mask2);
+
+    // mask ALL IRQs except IRQ1 (keyboard = bit 1)
+    port_write(PIC1_DATA, 0xFD);   // 11111101 — only IRQ1 unmasked
+    port_write(PIC2_DATA, 0xFF);   // all slave IRQs masked
 }
 
 void pic_unmask(uint8_t irq) {
